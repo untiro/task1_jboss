@@ -24,6 +24,3 @@ describe command('curl 192.168.56.10:8080') do
   its('stdout') { should match /Welcome to WildFly 10/ }
 end
 
-describe command('curl 192.168.56.10:8080/helloworld/hi.jsp') do
-  its('stdout') { should match /Hello, World/ }
-end

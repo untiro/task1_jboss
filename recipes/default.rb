@@ -28,12 +28,7 @@ bash 'extract_wildfly' do
   not_if { ::File.exist?('/opt/wildfly') }
 end
 
-bash 'extract_helloworld' do
-  code <<-EOH
-    unzip -u /tmp/chef-pkgs/HelloWorldWebApp.zip -d /opt/wildfly/standalone/deployments
-    EOH
-  not_if { ::File.exist?('/opt/wildfly/standalone/deployments/HellowWorld') }
-end
+include_recipe 'task1_jboss::deploy'
 
 service 'wildfly' do
   action [ :enable, :start ]
