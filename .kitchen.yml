@@ -5,7 +5,7 @@ driver:
     - ["forwarded_port", {guest: 80, host: 8082}]
     - ["private_network", {ip: "192.168.56.10"}]
   synced_folders:
-    - ["./chef-pkgs", "/tmp/chef-pkgs"]
+    - ["../chef-pkgs", "/tmp/chef-pkgs"]
 
 provisioner:
   name: chef_zero

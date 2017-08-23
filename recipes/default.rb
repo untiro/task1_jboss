@@ -4,6 +4,7 @@
 #
 # Copyright:: 2017, The Authors, All Rights Reserved.
 include_recipe 'java'
+include_recipe 'task3_database'
 
 package 'unzip' do
   action :install
