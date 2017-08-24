@@ -24,6 +24,7 @@ end
 
 execute 'systemctl_daemonreload' do
   command 'systemctl daemon-reload'
+  action :nothing
 end
 
 remote_file '/tmp/wildfly-10.1.0.Final.zip' do
