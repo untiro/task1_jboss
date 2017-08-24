@@ -8,7 +8,6 @@
 # This is an example test, replace it with your own test.
 describe port(8080) do
   it { should be_listening }
-  its('addresses') { should include '192.168.56.10' }
 end
 
 describe package('net-tools') do
@@ -20,7 +19,7 @@ describe service('wildfly') do
   it { should be_running }
 end
 
-describe command('curl 192.168.56.10:8080') do
+describe command('curl localhost:8080') do
   its('stdout') { should match /Welcome to WildFly 10/ }
 end
 

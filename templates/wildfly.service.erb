@@ -3,6 +3,6 @@ Description=Wildfly
 After=network.target
 [Service]
 Type=simple
-ExecStart=/opt/wildfly/bin/standalone.sh -c standalone-full.xml -b=192.168.56.10
+ExecStart=/opt/wildfly/bin/standalone.sh -c standalone-full.xml -b=0.0.0.0
 [Install]
 WantedBy=multi-user.target

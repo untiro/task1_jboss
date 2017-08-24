@@ -19,11 +19,21 @@ template '/etc/systemd/system/wildfly.service' do
   owner 'root'
   group 'root'
   mode '0755'
+  notifies :run, 'execute[systemctl_daemonreload]', :immediately
+end
+
+execute 'systemctl_daemonreload' do
+  command 'systemctl daemon-reload'
+end
+
+remote_file '/tmp/wildfly-10.1.0.Final.zip' do
+  source 'http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip'
+  action :create
 end
 
 bash 'extract_wildfly' do
   code <<-EOH
-    unzip /tmp/chef-pkgs/wildfly-10.1.0.Final.zip -d /opt
+    unzip /tmp/wildfly-10.1.0.Final.zip -d /opt
     mv /opt/wildfly-10.1.0.Final /opt/wildfly
     EOH
   not_if { ::File.exist?('/opt/wildfly') }

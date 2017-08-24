@@ -8,7 +8,7 @@
        ==> default: Importing base box 'sbeliakou/centos-7.3-x86_64-minimal'...
        [KProgress: 10%[KProgress: 30%[KProgress: 50%[KProgress: 70%[KProgress: 90%[K==> default: Matching MAC address for NAT networking...
        ==> default: Checking if box 'sbeliakou/centos-7.3-x86_64-minimal' is up to date...
-       ==> default: Setting the name of the VM: kitchen-task1_jboss-default-sbeliakou-centos-73-x86-64-minimal_default_1503489879595_75911
+       ==> default: Setting the name of the VM: kitchen-task1_jboss-default-sbeliakou-centos-73-x86-64-minimal_default_1503558209546_79466
        ==> default: Fixed port collision for 22 => 2222. Now on port 2204.
        ==> default: Clearing any previously set network interfaces...
        ==> default: Preparing network interfaces based on configuration...
@@ -22,8 +22,6 @@
            default: SSH address: 127.0.0.1:2204
            default: SSH username: vagrant
            default: SSH auth method: private key
-           default: Warning: Connection reset. Retrying...
-           default: Warning: Remote connection disconnect. Retrying...
            default: 
            default: Vagrant insecure key detected. Vagrant will automatically replace
            default: this with a newly generated keypair for better security.
@@ -43,7 +41,7 @@
        ==> default: Machine not provisioned because `--no-provision` is specified.
        [SSH] Established
        Vagrant instance <default-sbeliakou-centos-73-x86-64-minimal> created.
-       Finished creating <default-sbeliakou-centos-73-x86-64-minimal> (1m14.33s).
+       Finished creating <default-sbeliakou-centos-73-x86-64-minimal> (1m18.16s).
 -----> Converging <default-sbeliakou-centos-73-x86-64-minimal>...
        Preparing files for transfer
        Preparing dna.json
@@ -66,15 +64,17 @@
        Creating a new client identity for default-sbeliakou-centos-73-x86-64-minimal using the validator key.
        resolving cookbooks for run list: ["task1_jboss::default"]
        Synchronizing Cookbooks:
+         - task3_database (0.1.0)
          - task1_jboss (0.1.0)
          - java (1.50.0)
          - apt (6.1.3)
-         - ohai (5.2.0)
-         - windows (3.1.2)
          - homebrew (4.2.0)
+         - windows (3.1.2)
+         - mysql (8.5.1)
+         - ohai (5.2.0)
        Installing Cookbook Gems:
        Compiling Cookbooks...
-       Converging 16 resources
+       Converging 22 resources
        Recipe: java::notify
          * log[jdk-version-changed] action nothing (skipped due to action :nothing)
        Recipe: java::openjdk
@@ -136,54 +136,235 @@
          * template[/etc/profile.d/jdk.sh] action create
            - create new file /etc/profile.d/jdk.sh
            - update content in file /etc/profile.d/jdk.sh from none to 7f8009
-           --- /etc/profile.d/jdk.sh	2017-08-23 13:07:31.849773780 +0100
-           +++ /etc/profile.d/.chef-jdk20170823-12328-1efj605.sh	2017-08-23 13:07:31.849773780 +0100
+           --- /etc/profile.d/jdk.sh	2017-08-24 08:06:04.642173134 +0100
+           +++ /etc/profile.d/.chef-jdk20170824-12328-1mtvocp.sh	2017-08-24 08:06:04.642173134 +0100
            @@ -1 +1,2 @@
            +export JAVA_HOME=/usr/lib/jvm/java-1.8.0
            - change mode from '' to '0755'
+       Recipe: task3_database::default
+         * execute[mysql-community-repo] action run
+           - execute yum localinstall https://dev.mysql.com/get/mysql57-community-release-el7-8.noarch.rpm -y
+         * yum_package[net-tools] action install
+           - install version 2.0-0.17.20131004git.el7 of package net-tools
+         * mysql_service[default] action create
+           * mysql_server_installation_package[default] action install
+             * yum_package[mysql-community-server] action install[2017-08-24T08:06:27+01:00] WARN: yum_package[mysql-community-server] matched multiple Provides for mysql-community-server but we can only use the first match: mysql-community-server. Please use a more specific version.
+       [2017-08-24T08:06:27+01:00] WARN: yum_package[mysql-community-server] matched multiple Provides for mysql-community-server but we can only use the first match: mysql-community-server. Please use a more specific version.
+       
+        - install version 5.7.19-1.el7 of package mysql-community-server
+             * yum_package[perl-Sys-Hostname-Long] action nothing (skipped due to action :nothing)
+             * execute[Initial DB setup script] action nothing (skipped due to action :nothing)
+           
+           * mysql_service_manager_systemd[default] action create
+             * group[mysql] action create (up to date)
+             * linux_user[mysql] action create (up to date)
+             * service[mysql] action stop (up to date)
+             * service[mysql] action disable
+        - disable service service[mysql]
+             * file[/etc/mysql/my.cnf] action delete (up to date)
+             * file[/etc/my.cnf] action delete
+        - delete file /etc/my.cnf
+             * link[/usr/share/my-default.cnf] action create
+        - create symlink at /usr/share/my-default.cnf to /etc/mysql-default/my.cnf
+             * directory[/etc/mysql-default] action create
+        - create new directory /etc/mysql-default
+        - change mode from '' to '0750'
+        - change owner from '' to 'mysql'
+        - change group from '' to 'mysql'
+             * directory[/etc/mysql-default/conf.d] action create
+        - create new directory /etc/mysql-default/conf.d
+        - change mode from '' to '0750'
+        - change owner from '' to 'mysql'
+        - change group from '' to 'mysql'
+             * directory[/var/run/mysql-default] action create
+        - create new directory /var/run/mysql-default
+        - change mode from '' to '0755'
+        - change owner from '' to 'mysql'
+        - change group from '' to 'mysql'
+             * directory[/var/log/mysql-default] action create
+        - create new directory /var/log/mysql-default
+        - change mode from '' to '0750'
+        - change owner from '' to 'mysql'
+        - change group from '' to 'mysql'
+             * directory[/var/lib/mysql-default] action create
+        - create new directory /var/lib/mysql-default
+        - change mode from '' to '0750'
+        - change owner from '' to 'mysql'
+        - change group from '' to 'mysql'
+             * template[/etc/mysql-default/my.cnf] action create
+        - create new file /etc/mysql-default/my.cnf
+        - update content in file /etc/mysql-default/my.cnf from none to db0dc2
+        --- /etc/mysql-default/my.cnf	2017-08-24 08:09:12.270784855 +0100
+        +++ /etc/mysql-default/.chef-my20170824-12328-kvhmh2.cnf	2017-08-24 08:09:12.270784855 +0100
+        @@ -1 +1,23 @@
+        +# Chef generated my.cnf for instance mysql-default
+        +
+        +[client]
+        +default-character-set          = utf8
+        +port                           = 3306
+        +socket                         = /var/run/mysql-default/mysqld.sock
+        +
+        +[mysql]
+        +default-character-set          = utf8
+        +
+        +[mysqld]
+        +user                           = mysql
+        +pid-file                       = /var/run/mysql-default/mysqld.pid
+        +socket                         = /var/run/mysql-default/mysqld.sock
+        +bind-address                   = 0.0.0.0
+        +port                           = 3306
+        +datadir                        = /var/lib/mysql-default
+        +log-error                      = /var/log/mysql-default/error.log
+        +!includedir /etc/mysql-default/conf.d
+        +
+        +[mysqld_safe]
+        +socket                         = /var/run/mysql-default/mysqld.sock
+        - change mode from '' to '0600'
+        - change owner from '' to 'mysql'
+        - change group from '' to 'mysql'
+             * bash[default initial records] action run
+        - execute "bash"  "/tmp/chef-script20170824-12328-k3xrnm"
+           
+         
+         * mysql_service[default] action start
+           * mysql_service_manager_systemd[default] action start
+             * directory[/usr/libexec] action create (up to date)
+             * template[/usr/libexec/mysql-default-wait-ready] action create
+        - create new file /usr/libexec/mysql-default-wait-ready
+        - update content in file /usr/libexec/mysql-default-wait-ready from none to 7be882
+        --- /usr/libexec/mysql-default-wait-ready	2017-08-24 08:09:18.294091640 +0100
+        +++ /usr/libexec/.chef-mysql-default-wait-ready20170824-12328-176kfa7	2017-08-24 08:09:18.294091640 +0100
+        @@ -1 +1,31 @@
+        +#!/bin/sh
+        +
+        +daemon_pid="$1"
+        +
+        +# Wait for the server to come up or for the mysqld process to disappear
+        +ret=0
+        +while /bin/true; do
+        +        RESPONSE=`/usr/bin/mysqladmin --no-defaults --socket="/var/run/mysql-default/mysqld.sock" --user=UNKNOWN_MYSQL_USER ping 2>&1`
+        +        mret=$?
+        +        if [ $mret -eq 0 ]; then
+        +            break
+        +        fi
+        +        # exit codes 1, 11 (EXIT_CANNOT_CONNECT_TO_SERVICE) are expected,
+        +        # anything else suggests a configuration error
+        +        if [ $mret -ne 1 -a $mret -ne 11 ]; then
+        +            ret=1
+        +            break
+        +        fi
+        +        # "Access denied" also means the server is alive
+        +        echo "$RESPONSE" | grep -q "Access denied for user" && break
+        +
+        +        # Check process still exists
+        +        if ! /bin/kill -0 $daemon_pid 2>/dev/null; then
+        +            ret=1
+        +            break
+        +        fi
+        +        sleep 1
+        +done
+        +
+        +exit $ret
+        - change mode from '' to '0755'
+        - change owner from '' to 'root'
+        - change group from '' to 'root'
+             * template[/etc/systemd/system/mysql-default.service] action create
+        - create new file /etc/systemd/system/mysql-default.service
+        - update content in file /etc/systemd/system/mysql-default.service from none to 1031dc
+        --- /etc/systemd/system/mysql-default.service	2017-08-24 08:09:18.315740513 +0100
+        +++ /etc/systemd/system/.chef-mysql-default20170824-12328-1wgw7og.service	2017-08-24 08:09:18.314756473 +0100
+        @@ -1 +1,17 @@
+        +[Unit]
+        +Description=mysql_service[mysql-default]
+        +After=syslog.target
+        +After=network.target
+        +
+        +[Service]
+        +Type=simple
+        +User=mysql
+        +Group=mysql
+        +ExecStart=/usr/sbin/mysqld --defaults-file=/etc/mysql-default/my.cnf --basedir=/usr
+        +ExecStartPost=/usr/libexec/mysql-default-wait-ready $MAINPID
+        +TimeoutSec=300
+        +PrivateTmp=true
+        +
+        +[Install]
+        +WantedBy=multi-user.target
+        - change mode from '' to '0644'
+        - change owner from '' to 'root'
+        - change group from '' to 'root'
+             * execute[default systemctl daemon-reload] action run
+        - execute /bin/systemctl daemon-reload
+             * execute[default systemctl daemon-reload] action nothing (skipped due to action :nothing)
+             * template[/usr/lib/tmpfiles.d/mysql-default.conf] action create
+        - create new file /usr/lib/tmpfiles.d/mysql-default.conf
+        - update content in file /usr/lib/tmpfiles.d/mysql-default.conf from none to 701444
+        --- /usr/lib/tmpfiles.d/mysql-default.conf	2017-08-24 08:09:18.412176400 +0100
+        +++ /usr/lib/tmpfiles.d/.chef-mysql-default20170824-12328-19x1vc2.conf	2017-08-24 08:09:18.412176400 +0100
+        @@ -1 +1,2 @@
+        +d /var/run/mysql-default 0755 mysql mysql -
+        - change mode from '' to '0644'
+        - change owner from '' to 'root'
+        - change group from '' to 'root'
+             * service[mysql-default] action enable
+        - enable service service[mysql-default]
+             * service[mysql-default] action start
+        - start service service[mysql-default]
+           
+         
+         * bash[create_database] action run
+           - execute "bash"  "/tmp/chef-script20170824-12328-1111rfw"
        Recipe: task1_jboss::default
          * yum_package[unzip] action install
            - install version 6.0-16.el7 of package unzip
-         * yum_package[net-tools] action install
-           - install version 2.0-0.17.20131004git.el7 of package net-tools
+         * yum_package[net-tools] action install (up to date)
          * template[/etc/systemd/system/wildfly.service] action create
            - create new file /etc/systemd/system/wildfly.service
-           - update content in file /etc/systemd/system/wildfly.service from none to c31370
-           --- /etc/systemd/system/wildfly.service	2017-08-23 13:07:35.237681702 +0100
-           +++ /etc/systemd/system/.chef-wildfly20170823-12328-kvvoqb.service	2017-08-23 13:07:35.237681702 +0100
+           - update content in file /etc/systemd/system/wildfly.service from none to 026f6e
+           --- /etc/systemd/system/wildfly.service	2017-08-24 08:09:24.776944949 +0100
+           +++ /etc/systemd/system/.chef-wildfly20170824-12328-j2knku.service	2017-08-24 08:09:24.776944949 +0100
            @@ -1 +1,9 @@
            +[Unit]
            +Description=Wildfly
            +After=network.target
            +[Service]
            +Type=simple
-           +ExecStart=/opt/wildfly/bin/standalone.sh -c standalone-full.xml -b=192.168.56.10
+           +ExecStart=/opt/wildfly/bin/standalone.sh -c standalone-full.xml -b=0.0.0.0
            +[Install]
            +WantedBy=multi-user.target
            - change mode from '' to '0755'
            - change owner from '' to 'root'
            - change group from '' to 'root'
+         * execute[systemctl_daemonreload] action run
+           - execute systemctl daemon-reload
+         * execute[systemctl_daemonreload] action run
+           - execute systemctl daemon-reload
+         * remote_file[/tmp/wildfly-10.1.0.Final.zip] action create
+           - create new file /tmp/wildfly-10.1.0.Final.zip
+           - update content in file /tmp/wildfly-10.1.0.Final.zip from none to 1e10c8
+           (file sizes exceed 10000000 bytes, diff output suppressed)
          * bash[extract_wildfly] action run
-           - execute "bash"  "/tmp/chef-script20170823-12328-16um29a"
+           - execute "bash"  "/tmp/chef-script20170824-12328-a9dl0r"
        Recipe: task1_jboss::deploy
-         * bash[download_helloworld] action run (skipped due to not_if)
+         * bash[download_helloworld] action run
+           - execute "bash"  "/tmp/chef-script20170824-12328-1glctpy"
          * bash[extract_helloworld] action run
-           - execute "bash"  "/tmp/chef-script20170823-12328-137nyiz"
+           - execute "bash"  "/tmp/chef-script20170824-12328-18wiy07"
          * service[wildfly] action restart
            - restart service service[wildfly]
          * bash[wait_30_seconds] action run
-           - execute "bash"  "/tmp/chef-script20170823-12328-6723vs"
+           - execute "bash"  "/tmp/chef-script20170824-12328-swklea"
        Recipe: task1_jboss::default
          * service[wildfly] action enable
            - enable service service[wildfly]
          * service[wildfly] action start (up to date)
          * bash[wait_60_seconds] action run
-           - execute "bash"  "/tmp/chef-script20170823-12328-j4d1a7"
+           - execute "bash"  "/tmp/chef-script20170824-12328-10ny77x"
        
        Running handlers:
        Running handlers complete
-       Chef Client finished, 15/19 resources updated in 03 minutes 19 seconds
-       Finished converging <default-sbeliakou-centos-73-x86-64-minimal> (3m46.92s).
+       Chef Client finished, 43/55 resources updated in 07 minutes 53 seconds
+       Finished converging <default-sbeliakou-centos-73-x86-64-minimal> (8m52.40s).
 -----> Setting up <default-sbeliakou-centos-73-x86-64-minimal>...
        Finished setting up <default-sbeliakou-centos-73-x86-64-minimal> (0m0.00s).
 -----> Verifying <default-sbeliakou-centos-73-x86-64-minimal>...
@@ -198,21 +379,20 @@ Target:  ssh://vagrant@127.0.0.1:2204
 [38;5;41m     ✔  192.168.56.10:8080/helloworld/hi.jsp stdout should match /Hello, World/[0m
   Port 8080
 [38;5;41m     ✔  should be listening[0m
-[38;5;41m     ✔  addresses should include "192.168.56.10"[0m
   System Package
 [38;5;41m     ✔  net-tools should be installed[0m
   Service wildfly
 [38;5;41m     ✔  should be enabled[0m
 [38;5;41m     ✔  should be running[0m
   Command curl
-[38;5;41m     ✔  192.168.56.10:8080 stdout should match /Welcome to WildFly 10/[0m
+[38;5;41m     ✔  localhost:8080 stdout should match /Welcome to WildFly 10/[0m
 
-Test Summary: [38;5;41m7 successful[0m, [38;5;9m0 failures[0m, [38;5;247m0 skipped[0m
-       Finished verifying <default-sbeliakou-centos-73-x86-64-minimal> (0m5.90s).
+Test Summary: [38;5;41m6 successful[0m, [38;5;9m0 failures[0m, [38;5;247m0 skipped[0m
+       Finished verifying <default-sbeliakou-centos-73-x86-64-minimal> (0m7.84s).
 -----> Destroying <default-sbeliakou-centos-73-x86-64-minimal>...
        ==> default: Forcing shutdown of VM...
        ==> default: Destroying VM and associated drives...
        Vagrant instance <default-sbeliakou-centos-73-x86-64-minimal> destroyed.
-       Finished destroying <default-sbeliakou-centos-73-x86-64-minimal> (0m6.28s).
-       Finished testing <default-sbeliakou-centos-73-x86-64-minimal> (5m13.49s).
------> Kitchen is finished. (5m14.82s)
+       Finished destroying <default-sbeliakou-centos-73-x86-64-minimal> (0m8.13s).
+       Finished testing <default-sbeliakou-centos-73-x86-64-minimal> (10m26.71s).
+-----> Kitchen is finished. (10m30.76s)
